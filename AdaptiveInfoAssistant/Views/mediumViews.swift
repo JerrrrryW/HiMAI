@@ -1,12 +1,69 @@
 import SwiftUI
 import RealityKit
 
-struct speedMediumView: View {
+// 定义仪表盘配置的结构体
+struct GaugeData {
+    let value: CGFloat    // 当前数值
+    let minValue: CGFloat // 最小值
+    let maxValue: CGFloat // 最大值
+    let unit: String      // 单位
+    let icon: String      // 图标名称
+}
+
+struct gaugeMediumView: View {
+    var gaugeData: GaugeData
+
+    // 计算当前进度百分比
+    private var progress: CGFloat {
+        let range = gaugeData.maxValue - gaugeData.minValue
+        return (gaugeData.value - gaugeData.minValue) / range
+    }
+
     var body: some View {
-        Image("speedMedium")
-            .resizable()
-            .padding(30)
-            .frame(width: 200, height:  200)
+        ZStack {
+            // 背景圆圈
+            Circle()
+                .stroke(
+                    Color.gray.opacity(0.3),
+                    style: StrokeStyle(lineWidth: 12)
+                )
+                .frame(width: 150, height: 150)
+            
+            // 进度圆弧
+            Circle()
+                .trim(from: 0.0, to: progress) // 根据progress值显示进度
+                .stroke(
+                    AngularGradient(
+                        gradient: Gradient(colors: [Color.green, Color.blue]),
+                        center: .center,
+                        startAngle: .degrees(0),
+                        endAngle: .degrees(360)
+                    ),
+                    style: StrokeStyle(lineWidth: 12, lineCap: .round)
+                )
+                .rotationEffect(Angle(degrees: -220)) // 旋转起始角度
+                .frame(width: 150, height: 150)
+                .animation(.easeInOut(duration: 0.6), value: progress)
+
+            // 中心内容
+            VStack(spacing: 5) {
+                // 显示图标
+                Image(systemName: gaugeData.icon)
+                    .font(.system(size: 20))
+                    .foregroundColor(.gray)
+                
+                // 显示当前数值
+                Text("\(Int(gaugeData.value))") // 显示数值
+                    .font(.system(size: 40, weight: .bold))
+                    .foregroundColor(.primary)
+                
+                // 显示单位
+                Text(gaugeData.unit)
+                    .font(.system(size: 20))
+                    .foregroundColor(.secondary)
+            }
+        }
+        .padding(30)
     }
 }
 
@@ -117,96 +174,6 @@ struct cameraMediumView: View{
     }
 }
 
-struct previewCardTests: View {
-    @State var selectedInfo: String = "speed"
-    @State private var showAlert = false
-    
-    @Binding var isManual: Bool
-    
-    @Environment(\.openWindow) var openWindow
-    @Environment(\.dismissWindow) var dismissWindow
-    
-    var body: some View {
-        HStack{
-            if isManual {
-                VStack{
-                    speedMediumView()
-                        .glassBackgroundEffect()
-                    attitudeMediumView()
-                        .glassBackgroundEffect()
-                    fuelMediumView()
-                        .glassBackgroundEffect()
-                    heightMediumView()
-                        .glassBackgroundEffect()
-                }
-                .transition(.slide)
-            } else {
-                Grid{
-                    GridRow{
-                        speedMediumView()
-                            .glassBackgroundEffect()
-                        attitudeMediumView()
-                            .glassBackgroundEffect()
-                    }
-                    GridRow{
-                        fuelMediumView()
-                            .glassBackgroundEffect()
-                        heightMediumView()
-                            .glassBackgroundEffect()
-                    }
-                }
-                .transition(.slide)
-            }
-            Spacer()
-            if isManual {
-                VStack{
-                    topographic3DMediumView()
-                        .frame(width: 400, height: 300)
-                        .glassBackgroundEffect()
-                }
-                .transition(.opacity)
-            } else {
-                VStack{
-                    cameraMediumView(isShowingAssistMark: $showAlert)
-                        .frame(width: 400, height: 300)
-                        .glassBackgroundEffect()
-                    topographic3DMediumView()
-                        .frame(width: 400, height: 300)
-                        .glassBackgroundEffect()
-                }
-                .transition(.move(edge: .trailing))
-            }
-        }
-        .animation(.easeInOut, value: isManual)
-        .ornament(attachmentAnchor: .scene(.bottom)){
-            HStack(spacing: 10) {
-                IconButton(imageName: "location", selectedInfo: $selectedInfo)
-                IconButton(imageName: "graduated scale", selectedInfo: $selectedInfo)
-                IconButton(imageName: "scale", selectedInfo: $selectedInfo)
-                IconButton(imageName: "trajectory", selectedInfo: $selectedInfo)
-                IconButton(imageName: "tips", selectedInfo: $selectedInfo)
-            }
-            .padding()
-            .glassBackgroundEffect()
-            Text("已折叠信息项").foregroundStyle(.secondary).font(.system(size: 20, weight: .bold))
-        }
-        .onChange(of: showAlert) {
-            openWindow(id: "cameraDetailedView")
-        }
-//        .alert("系统检测到光学图像显示地形异常！建议切换至半自动或手动模式。", isPresented: $showAlert) {
-//            Button("切换到手控模式", role: .cancel) {
-//                // 在弹窗中点击"确定"后的操作
-//                openWindow(id: "cameraDetailedView")
-//                isManual = true
-//            }
-//            Button("保持当前模式", role: .destructive) {
-//                // 在弹窗中点击"删除"后的操作
-//            }
-//        } message: {
-//            Text("你确定要继续吗？")
-//        }
-    }
-}
 
 
 struct IconButton: View {
@@ -229,5 +196,14 @@ struct IconButton: View {
 
 
 #Preview {
-    topographic3DMediumView()
+//    topographic3DMediumView()
+    let testData = GaugeData(
+        value: 25,
+        minValue: 0,
+        maxValue: 200,
+        unit: "km/h",
+        icon: "timer"
+    )
+    gaugeMediumView(gaugeData: testData)
+        .glassBackgroundEffect()
 }
