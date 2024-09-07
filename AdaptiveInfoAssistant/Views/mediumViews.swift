@@ -1,21 +1,30 @@
 import SwiftUI
 import RealityKit
 
-// 定义仪表盘配置的结构体
-struct GaugeData {
-    let value: CGFloat    // 当前数值
-    let minValue: CGFloat // 最小值
-    let maxValue: CGFloat // 最大值
-    let unit: String      // 单位
-    let icon: String      // 图标名称
-}
-
 struct gaugeMediumView: View {
-    var gaugeData: GaugeData
+    var item: String  // 从generateView传入的item字符串
+    @EnvironmentObject var model:InfoModel
+    
+    // 根据item字符串提取对应的GaugeData
+    private var gaugeData: GaugeData {
+        switch item {
+        case "hSpeed":
+            return model.horizontalSpeedGauge
+        case "vSpeed":
+            return model.verticalSpeedGauge
+        case "fuel":
+            return model.fuelGauge
+        case "height":
+            return model.altitudeGauge
+        default:
+            return model.horizontalSpeedGauge // 默认值，可根据需要调整
+        }
+    }
 
     // 计算当前进度百分比
     private var progress: CGFloat {
         let range = gaugeData.maxValue - gaugeData.minValue
+//        print("gaugeMediumView: current value: \(gaugeData.value)")
         return (gaugeData.value - gaugeData.minValue) / range
     }
 
@@ -204,6 +213,6 @@ struct IconButton: View {
         unit: "km/h",
         icon: "timer"
     )
-    gaugeMediumView(gaugeData: testData)
+    gaugeMediumView(item: "vSpeed")
         .glassBackgroundEffect()
 }

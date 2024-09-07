@@ -33,13 +33,15 @@ struct AdaptiveInfoAssistantApp: App {
         .defaultSize(width: 2160, height: 1080)
         
         WindowGroup(id:"leftAssistPanel"){
-            LeftPanel(infoItems: leftPanelInfoItems, model: infoModal)
+            LeftPanel(infoItems: leftPanelInfoItems)
+                .environmentObject(infoModal)
         }
         .windowStyle(.plain)
         .defaultSize(width:500, height: 1080)
         
         WindowGroup(id:"rightAssistPanel"){
-            RightPanel(infoItems: rightPanelInfoItems, model: infoModal)
+            RightPanel(infoItems: rightPanelInfoItems)
+                .environmentObject(infoModal)
         }.windowStyle(.plain)
         
         WindowGroup(id:"cameraDetailedView"){

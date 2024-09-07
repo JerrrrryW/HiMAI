@@ -32,36 +32,22 @@ struct InfoItem {
 
 // Abstract function that generates a view based on item and priority
 @ViewBuilder
-func generateView(item: String, priority: String, model: InfoModel) -> some View {
+func generateView(item: String, priority: String) -> some View {
     switch (item, priority) {
     case ("hSpeed", "medium"):
-        gaugeMediumView(
-            gaugeData: GaugeData(
-                value: model.horizontalSpeed,
-                minValue: -100,
-                maxValue: 0,
-                unit: "m/s",
-                icon: "arrow.right"
-            )
-        )
+        gaugeMediumView(item: "hSpeed")
             .glassBackgroundEffect()
     case ("vSpeed", "medium"):
-        gaugeMediumView(
-            gaugeData: GaugeData(
-                value: model.verticalSpeed,
-                minValue: -100,
-                maxValue: 0,
-                unit: "m/s",
-                icon: "arrow.up"
-            )
-        )
-        .glassBackgroundEffect()
+        gaugeMediumView(item: "vSpeed")
+            .glassBackgroundEffect()
     case ("attitude", "medium"):
         attitudeMediumView().glassBackgroundEffect()
     case ("fuel", "medium"):
-        fuelMediumView().glassBackgroundEffect()
+        gaugeMediumView(item: "fuel")
+            .glassBackgroundEffect()
     case ("height", "medium"):
-        heightMediumView().glassBackgroundEffect()
+        gaugeMediumView(item: "height")
+            .glassBackgroundEffect()
     case ("topographic3D", "medium"):
         topographic3DMediumView().glassBackgroundEffect()
     case ("camera", "medium"):
@@ -75,12 +61,12 @@ func generateView(item: String, priority: String, model: InfoModel) -> some View
 // LeftPanel View with dynamic child component generation based on infoItems array
 struct LeftPanel: View {
     var infoItems: [InfoItem]  // Array of information items
-    var model: InfoModel
+    @EnvironmentObject var model: InfoModel
 
     var body: some View {
         VStack {
             ForEach(infoItems, id: \.item) { info in
-                generateView(item: info.item, priority: info.priority, model: model)
+                generateView(item: info.item, priority: info.priority)
             }
         }
         .transition(.slide)
@@ -96,12 +82,12 @@ struct LeftPanel: View {
 // RightPanel View with dynamic child component generation based on infoItems array
 struct RightPanel: View {
     var infoItems: [InfoItem]  // Array of information items
-    var model: InfoModel
+    @EnvironmentObject var model: InfoModel
 
     var body: some View {
         VStack {
             ForEach(infoItems, id: \.item) { info in
-                generateView(item: info.item, priority: info.priority, model: model)
+                generateView(item: info.item, priority: info.priority)
                     .frame(width: 400, height: 300)
             }
         }
@@ -134,9 +120,11 @@ struct previewCardTests: View {
     
     var body: some View {
         HStack {
-            LeftPanel(infoItems: leftPanelInfoItems, model: model)
+            LeftPanel(infoItems: leftPanelInfoItems)
+                .environmentObject(model)
             Spacer()
-            RightPanel(infoItems: rightPanelInfoItems, model: model)
+            RightPanel(infoItems: rightPanelInfoItems)
+                .environmentObject(model)
         }
         .animation(.easeInOut, value: showAlert)
         .ornament(attachmentAnchor: .scene(.bottom)) {
