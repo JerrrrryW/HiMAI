@@ -4,17 +4,55 @@ struct ContentView: View {
     
     @State private var showImmersiveSpace = false
     @State private var immersiveSpaceIsShown = false
+    
+    @EnvironmentObject var layoutModel: LayoutModel
 
     @Environment(\.openWindow) private var openWindow
     @Environment(\.dismissWindow) private var dismissWindow
-    @Environment(\.openImmersiveSpace) var openImmersiveSpace
-    @Environment(\.dismissImmersiveSpace) var dismissImmersiveSpace
     
     
     var body: some View {
         VStack {
-            Toggle("进入登月着陆信息辅助模拟模式", isOn: $showImmersiveSpace)
+            Toggle("打开辅助信息面板", isOn: $showImmersiveSpace)
                 .toggleStyle(.button)
+            Text("当前阶段: \(layoutModel.currentStage + 1)")
+                            .font(.title)
+                        
+                        // 左面板测试
+                        Text("左面板组件:")
+                        ForEach(layoutModel.leftPanelInfoItems, id: \.item) { info in
+                            Text("\(info.item) - \(info.priority)")
+                        }
+                        
+                        // 右面板测试
+                        Text("右面板组件:")
+                        ForEach(layoutModel.rightPanelInfoItems, id: \.item) { info in
+                            Text("\(info.item) - \(info.priority)")
+                        }
+                        
+                        HStack {
+                            Button(action: {
+                                layoutModel.previousStage()
+                            }) {
+                                Text("上一阶段")
+                            }
+                            .padding()
+                            
+                            Button(action: {
+                                layoutModel.nextStage()
+                            }) {
+                                Text("下一阶段")
+                            }
+                            .padding()
+                        }
+                        
+                        // 测试切换到指定阶段
+                        Button(action: {
+                            layoutModel.switchToStage(1) // 切换到第2个阶段
+                        }) {
+                            Text("切换到第2阶段")
+                        }
+                        .padding()
         }
         .padding()
         .onChange(of: showImmersiveSpace) { _, newValue in

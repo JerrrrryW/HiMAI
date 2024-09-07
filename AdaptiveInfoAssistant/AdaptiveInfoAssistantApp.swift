@@ -4,7 +4,8 @@ import SwiftUI
 @main
 struct AdaptiveInfoAssistantApp: App {
     
-    @StateObject var infoModal: InfoModel = .init()
+    @StateObject var infoModel: InfoModel = .init()
+    @StateObject var layoutModel: LayoutModel = .init()
     
     @State var isManual: Bool = false
     @State var leftPanelInfoItems: [InfoItem] = [
@@ -23,6 +24,7 @@ struct AdaptiveInfoAssistantApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .environmentObject(layoutModel)
                 .fixedSize()
         }.windowResizability(.contentSize)
         
@@ -33,15 +35,15 @@ struct AdaptiveInfoAssistantApp: App {
         .defaultSize(width: 2160, height: 1080)
         
         WindowGroup(id:"leftAssistPanel"){
-            LeftPanel(infoItems: leftPanelInfoItems)
-                .environmentObject(infoModal)
+            LeftPanel(infoItems: layoutModel.leftPanelInfoItems)
+                .environmentObject(infoModel)
         }
         .windowStyle(.plain)
         .defaultSize(width:500, height: 1080)
         
         WindowGroup(id:"rightAssistPanel"){
-            RightPanel(infoItems: rightPanelInfoItems)
-                .environmentObject(infoModal)
+            RightPanel(infoItems: layoutModel.rightPanelInfoItems)
+                .environmentObject(infoModel)
         }.windowStyle(.plain)
         
         WindowGroup(id:"cameraDetailedView"){

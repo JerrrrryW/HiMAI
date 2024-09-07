@@ -69,7 +69,6 @@ struct LeftPanel: View {
                 generateView(item: info.item, priority: info.priority)
             }
         }
-        .transition(.slide)
         .onAppear {
             model.startUpdating()
         }
@@ -91,7 +90,6 @@ struct RightPanel: View {
                     .frame(width: 400, height: 300)
             }
         }
-        .transition(.move(edge: .trailing))
     }
 }
 
