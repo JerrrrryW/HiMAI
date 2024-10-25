@@ -37,6 +37,9 @@ class InfoModel: ObservableObject {
     @Published var fuelGauge: GaugeData = GaugeData(value: 75, minValue: 0, maxValue: 100, unit: "%", icon: "fuelpump")
     @Published var thrustGauge: GaugeData = GaugeData(value: 60, minValue: 0, maxValue: 100, unit: "%", icon: "flame")
     
+    @Published var thrustToWeightRatio: GaugeData = GaugeData(value: 1.0, minValue: 0, maxValue: 3, unit: "", icon: "scalemass")
+    @Published var estimatedImpactVelocity: GaugeData = GaugeData(value: 5, minValue: 0, maxValue: 100, unit: "m/s", icon: "speedometer")
+    
     @Published var landingMode: LandingMode = .auto
     
     private var timer: Timer?
@@ -54,13 +57,13 @@ class InfoModel: ObservableObject {
 
     // 更新数据模拟函数
     private func updateData() {
-        altitudeGauge.value = max(altitudeGauge.value + CGFloat.random(in: -10...5), 0)
+        altitudeGauge.value = max(altitudeGauge.value + CGFloat.random(in: -10...10), 0)
         verticalSpeedGauge.value = CGFloat.random(in: -60 ... -40)
         horizontalSpeedGauge.value = CGFloat.random(in: 15 ... 25)
         pitchGauge.value = CGFloat.random(in: -5 ... 5)
         rollGauge.value = CGFloat.random(in: -10 ... 10)
         yawGauge.value = CGFloat.random(in: -5 ... 5)
-        fuelGauge.value = max(fuelGauge.value - CGFloat.random(in: 0.1...0.5), 0)
+        fuelGauge.value = max(fuelGauge.value + CGFloat.random(in: 0.01...0.5), 0)
         thrustGauge.value = CGFloat.random(in: 50 ... 70)
         
 //        print("InfoModal Updating")

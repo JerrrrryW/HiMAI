@@ -7,26 +7,12 @@ struct AdaptiveInfoAssistantApp: App {
     @StateObject var infoModel: InfoModel = .init()
     @StateObject var layoutModel: LayoutModel = .init()
     
-    @State var isManual: Bool = false
-    @State var leftPanelInfoItems: [InfoItem] = [
-        InfoItem(item: "hSpeed", priority: "medium"),
-        InfoItem(item: "vSpeed", priority: "medium"),
-        InfoItem(item: "attitude", priority: "medium"),
-        InfoItem(item: "fuel", priority: "medium"),
-        InfoItem(item: "height", priority: "medium")
-    ]
-    @State var  rightPanelInfoItems: [InfoItem] = [
-        InfoItem(item: "camera", priority: "medium"),
-        InfoItem(item: "topographic3D", priority: "medium")
-    ]
-    
     
     var body: some Scene {
         WindowGroup {
             ContentView()
                 .environmentObject(layoutModel)
-                .fixedSize()
-        }.windowResizability(.contentSize)
+        }.defaultSize(width: 400, height: 200)
         
         WindowGroup(id:"landingTaskView"){
             LandingTaskView()
@@ -46,8 +32,15 @@ struct AdaptiveInfoAssistantApp: App {
                 .environmentObject(infoModel)
         }.windowStyle(.plain)
         
-        WindowGroup(id:"cameraDetailedView"){
-            cameraDetailedView(isManual: $isManual).glassBackgroundEffect()
+        WindowGroup(id: "highPriorityPanel") {
+            HighPriorityView(infoItems: layoutModel.highPriorityInfoItems)
+                .environmentObject(infoModel)
+                .environmentObject(layoutModel)
         }
+        .windowStyle(.plain)
+        
+//        WindowGroup(id:"cameraDetailedView"){
+//            cameraDetailedView().glassBackgroundEffect()
+//        }
     }
 }

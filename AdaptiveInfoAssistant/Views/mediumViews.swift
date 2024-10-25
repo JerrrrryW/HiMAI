@@ -3,8 +3,8 @@ import RealityKit
 
 struct gaugeMediumView: View {
     var item: String  // 从generateView传入的item字符串
-    @EnvironmentObject var model:InfoModel
-    
+    @EnvironmentObject var model: InfoModel
+
     // 根据item字符串提取对应的GaugeData
     private var gaugeData: GaugeData {
         switch item {
@@ -16,15 +16,18 @@ struct gaugeMediumView: View {
             return model.fuelGauge
         case "height":
             return model.altitudeGauge
+        case "thrustToWeightRatio":  // 新增推力比
+            return model.thrustToWeightRatio
+        case "estimatedImpactVelocity":  // 新增估计撞击速度
+            return model.estimatedImpactVelocity
         default:
-            return model.horizontalSpeedGauge // 默认值，可根据需要调整
+            return model.horizontalSpeedGauge // 默认值
         }
     }
 
     // 计算当前进度百分比
     private var progress: CGFloat {
         let range = gaugeData.maxValue - gaugeData.minValue
-//        print("gaugeMediumView: current value: \(gaugeData.value)")
         return (gaugeData.value - gaugeData.minValue) / range
     }
 
@@ -73,6 +76,10 @@ struct gaugeMediumView: View {
             }
         }
         .padding(30)
+        Text("\(item)")
+            .font(.title)
+            .foregroundStyle(.primary)
+            .padding(.horizontal)
     }
 }
 
@@ -155,7 +162,7 @@ struct topographic3DMediumView: View{
 }
 
 struct cameraMediumView: View{
-    @Binding var isShowingAssistMark: Bool
+    @State var isShowingAssistMark: Bool = false
     
     var body: some View {
         ZStack{
@@ -205,14 +212,8 @@ struct IconButton: View {
 
 
 #Preview {
-//    topographic3DMediumView()
-    let testData = GaugeData(
-        value: 25,
-        minValue: 0,
-        maxValue: 200,
-        unit: "km/h",
-        icon: "timer"
-    )
+    @StateObject var infoModel: InfoModel = .init()
     gaugeMediumView(item: "vSpeed")
+        .environmentObject(infoModel)
         .glassBackgroundEffect()
 }

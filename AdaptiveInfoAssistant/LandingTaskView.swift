@@ -49,10 +49,30 @@ func generateView(item: String, priority: String) -> some View {
         gaugeMediumView(item: "height")
             .glassBackgroundEffect()
     case ("topographic3D", "medium"):
-        topographic3DMediumView().glassBackgroundEffect()
-    case ("camera", "medium"):
-        cameraMediumView(isShowingAssistMark: .constant(false))
+        topographic3DMediumView()
+            .frame(maxWidth: 300, maxHeight: 400)
             .glassBackgroundEffect()
+    case ("camera", "medium"):
+        cameraMediumView()
+            .frame(maxWidth: 300, maxHeight: 400)
+            .glassBackgroundEffect()
+    case ("thrustToWeightRatio", "medium"):  // 新增推力比
+        gaugeMediumView(item: "thrustToWeightRatio")
+            .glassBackgroundEffect()
+    case ("estimatedImpactVelocity", "medium"):  // 新增估计撞击速度
+        gaugeMediumView(item: "estimatedImpactVelocity")
+            .glassBackgroundEffect()
+    case ("camera", "high"):
+        cameraDetailedView()
+            .glassBackgroundEffect()
+    case ("collisionWarning", "high"):
+        Text("Collision Warning")
+            .font(.headline)
+            .foregroundColor(.red)
+    case ("criticalFuel", "high"):
+        Text("Critical Fuel Level")
+            .font(.headline)
+            .foregroundColor(.red)
     default:
         EmptyView()
     }
@@ -87,13 +107,49 @@ struct RightPanel: View {
         VStack {
             ForEach(infoItems, id: \.item) { info in
                 generateView(item: info.item, priority: info.priority)
-                    .frame(width: 400, height: 300)
             }
         }
     }
 }
 
-// Refactored previewCardTests View
+struct HighPriorityView: View {
+    var infoItems: [InfoItem]
+    @EnvironmentObject var model: InfoModel
+    @EnvironmentObject var layoutModel: LayoutModel
+    @State private var selectedInfo: String = ""
+    
+    var body: some View {
+        VStack {
+//            if layoutModel.highPriorityInfoItems.isEmpty {
+//                Text("暂无高优先级警告")
+//                    .font(.title)
+//                    .foregroundColor(.secondary)
+//            }
+            
+            ForEach(infoItems, id: \.item) { info in
+                generateView(item: info.item, priority: info.priority)
+                    .padding()
+            }
+        }
+        .ornament(attachmentAnchor: .scene(.bottom)){
+            HStack(spacing: 10) {
+                withAnimation(.easeInOut) {
+                    ForEach(layoutModel.ornamentInfoItems, id: \.item) { info in
+                        IconButton(imageName: info.item, selectedInfo: $selectedInfo)
+                    }
+                }
+            }
+            .padding()
+            .glassBackgroundEffect()
+            Text("已折叠信息项")
+                .foregroundStyle(.secondary)
+                .font(.system(size: 20, weight: .bold))
+        }
+        .padding()
+        
+    }
+}
+
 struct previewCardTests: View {
     @State var selectedInfo: String = "speed"
     @State private var showAlert = false
